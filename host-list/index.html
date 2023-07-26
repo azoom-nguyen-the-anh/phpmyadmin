@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Host list</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 5px 10px;
+      }
+      #app {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .hidden {
+        display: none;
+      }
+      input {
+        outline: none;
+        border: none;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div ref="app" class="hidden" id="app">
+      <h1>{{ title }}</h1>
+      <table border="1px">
+        <tr>
+          <th>Host</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th></th>
+        </tr>
+        <tr v-for="(item, index) in hosts" :key="index">
+          <td>{{ item.host }}</td>
+          <td>{{ item.username }}</td>
+          <td>{{ item.password }}</td>
+          <td><button @click="deleteHost(index)">Xoá</button></td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              v-model="newHost.host"
+              v-validate="'required'"
+              type="text"
+              name="host"
+              placeholder="Nhập host"
+            />
+          </td>
+          <td>
+            <input
+              v-model="newHost.username"
+              v-validate="'required'"
+              type="text"
+              name="username"
+              placeholder="Nhập username"
+            />
+          </td>
+          <td>
+            <input
+              v-model="newHost.password"
+              type="text"
+              name="host"
+              placeholder="Nhập password"
+            />
+          </td>
+          <td>
+            <button @click="addHost" :disabled="!!errors.first('host')">
+              Thêm
+            </button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <script type="module">
+      import Vue from "./lib/vue2.js";
+      import axios from "./lib/axios.js";
+      import VeeValidate from "./lib/vee-validate.js";
+
+      Vue.use(VeeValidate, {
+        dictionary: {
+          en: {
+            custom: {
+              host: {
+                required: "Vui lòng nhập host",
+              },
+              username: {
+                required: "Vui lòng nhập host",
+              },
+            },
+          },
+        },
+      });
+
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            title: "Host list",
+            hosts: [],
+            newHost: {
+              host: "",
+              username: "",
+              password: "",
+            },
+          };
+        },
+        methods: {
+          async getHostList() {
+            const { data } = await axios.get(
+              "http://localhost/phpmyadmin/host-list/api/host-list.php"
+            );
+            this.hosts = data;
+          },
+          async updateHostList() {
+            const { data } = await axios.post(
+              "http://localhost/phpmyadmin/host-list/api/update-host-list.php",
+              {
+                hosts: this.hosts,
+              }
+            );
+          },
+          deleteHost(index) {
+            const isConfirm = confirm("Bạn có muốn xoá host này không ?");
+            if (!isConfirm || this.hosts.length === 1) return;
+
+            this.hosts.splice(index, 1);
+            this.updateHostList();
+          },
+          async addHost() {
+            const isValid = await this.$validator.validate();
+            if (!isValid) return;
+
+            const { host, password } = this.newHost;
+            this.newHost.host = "";
+            this.newHost.password = "";
+
+            this.hosts.push({ host, password });
+
+            this.updateHostList();
+          },
+        },
+        mounted() {
+          this.$refs.app.classList.toggle("hidden");
+          this.getHostList();
+        },
+      });
+    </script>
+  </body>
+</html>
