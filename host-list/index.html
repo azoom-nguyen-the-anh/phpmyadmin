@@ -91,6 +91,10 @@
       import axios from "./lib/axios.js";
       import VeeValidate from "./lib/vee-validate.js";
 
+      const api = axios.create({
+        baseURL: window.location.pathname,
+      });
+
       Vue.use(VeeValidate, {
         dictionary: {
           en: {
@@ -121,18 +125,13 @@
         },
         methods: {
           async getHostList() {
-            const { data } = await axios.get(
-              "http://localhost/phpmyadmin/host-list/api/host-list.php"
-            );
+            const { data } = await api.get("/api/host-list.php");
             this.hosts = data;
           },
           async updateHostList() {
-            const { data } = await axios.post(
-              "http://localhost/phpmyadmin/host-list/api/update-host-list.php",
-              {
-                hosts: this.hosts,
-              }
-            );
+            const { data } = await api.post("/api/update-host-list.php", {
+              hosts: this.hosts,
+            });
           },
           deleteHost(index) {
             const isConfirm = confirm("Bạn có muốn xoá host này không ?");

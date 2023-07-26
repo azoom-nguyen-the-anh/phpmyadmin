@@ -37,7 +37,7 @@ class __TwigTemplate_bb3813f773eed68dc2bd498c864998f0 extends Template
         echo ($context["login_header"] ?? null);
         echo "
 <center>
-<a href=\"http://localhost/phpmyadmin/host-list/\" target=\"_blank\">Host list</a>
+<a href=\"/phpmyadmin/host-list/\" target=\"_blank\">Host list</a>
 </center>
 
 ";
