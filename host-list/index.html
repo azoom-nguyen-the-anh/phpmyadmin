@@ -144,11 +144,11 @@
             const isValid = await this.$validator.validate();
             if (!isValid) return;
 
-            const { host, password } = this.newHost;
+            const { host, username, password } = this.newHost;
             this.newHost.host = "";
             this.newHost.password = "";
 
-            this.hosts.push({ host, password });
+            this.hosts.push({ host, username, password });
 
             this.updateHostList();
           },
