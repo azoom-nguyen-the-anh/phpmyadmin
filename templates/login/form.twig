@@ -1,7 +1,40 @@
 {{ login_header|raw }}
-<center>
-<a href="/phpmyadmin/host-list/" target="_blank">Host list</a>
-</center>
+
+<center><a href="/phpmyadmin/host-list/" target="_blank">Host list</a></center>
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th,
+  td {
+    padding: 5px 10px;
+    border: 1px solid #eee;
+  }
+</style>
+<table>
+  <tr>
+    <th>Host</th>
+    <th>Username</th>
+    <th>Password</th>
+  </tr>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script type="module">
+  import axios from "/phpmyadmin/host-list/lib/axios.js";
+
+  const { data } = await axios.get("/phpmyadmin/host-list/api/host-list.php");
+  let tbody = ``;
+  for (let item of data) {
+    tbody += '<tr>'
+    tbody += `<td>${item.host}</td>`
+    tbody += `<td>${item.username}</td>`
+    tbody += `<td>${item.password}</td>`
+    tbody += '</tr>'
+  }
+  document.getElementById("tbody").innerHTML = tbody
+</script>
 
 {% if is_demo %}
   <div class="card mb-4">

@@ -3,7 +3,12 @@ $body = json_decode(file_get_contents('php://input'));
 
 $hosts = json_encode($body->hosts);
 
-$file = fopen("../../host-list.json", "w") or die("Unable to open file!");
+$file = fopen("../../host-list.json", "w");
 
-fwrite($file, $hosts);
+if (fwrite($file, $hosts) === false) {
+  echo "Không thể ghi vào file.";
+} else {
+  echo "Ghi dữ liệu thành công.";
+}
+
 fclose($file);
